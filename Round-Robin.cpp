@@ -33,9 +33,9 @@ int main()
     vector<pair<int, int> > response_times(n) ; // ? response_times[i] = <flag, response time> 
     vector<pair<int, pair<int, int> > > gantt ; // ? (PID, (start_time, finish_time))
 
-    priority_queue<pair<int, int> , vector<pair<int, int> > , greater<pair<int, int> > > ready_queue ; // ? <arrival time, PID>
+    priority_queue<pair<double, int> , vector<pair<double, int> > , greater<pair<double, int> > > ready_queue ; // ? <arrival time, PID>
     for(int i = 0 ; i < n ; i++)
-        ready_queue.push(make_pair(arrival_times[i], i)) ;
+        ready_queue.push(make_pair((double) arrival_times[i], i)) ;
 
     while(!ready_queue.empty())
     {
@@ -56,7 +56,10 @@ int main()
         CPU_times[pid] -= execution_time ;
 
         if(CPU_times[pid] > 0)
-            ready_queue.push(make_pair(curr_time, pid)) ;
+        {
+            ready_queue.push(make_pair(curr_time + 0.1, pid)) ;
+            arrival_times[pid] = curr_time ;
+        }
     }
 
     int total_waiting_time = 0 ;
@@ -88,3 +91,15 @@ int main()
 
     return 0;
 }
+
+// ? Test Case 1:
+// 3
+// 4
+// 5 7 9 9
+// 4 0 6 10
+
+// ? Test Case 2:
+// 4
+// 6
+// 8 8 6 10 13 6
+// 17 16 6 0 12 8
