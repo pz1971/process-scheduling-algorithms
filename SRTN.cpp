@@ -98,7 +98,7 @@ int main()
         cout << "<" << i.first << ", " << i.second.first << ", " << i.second.second << ">" << endl ;
     for(int i = 0 ; i < n ; i++)
     {
-        cout << "Process " << i + 1 << ": " ;
+        cout << "Process " << i << ": " ;
         cout << "Response Time : " << response_times[i].second << " Waiting Time : " << waiting_times[i] << " Turnaround Time : " << turnaround_times[i] << endl ;
     }
     cout << "Average Response Time : " << average_response_time << endl ;
