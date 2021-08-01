@@ -23,30 +23,30 @@ int main()
         cin >> i ;
     cout << "Enter the priority values" << endl ;
     for(auto &i : priority_values)
-        cin >> i ;
+        cin >> i ; // ** lower value has higher priority
     // ** ** ** **
 
     int curr_time = 0 ;
     vector<int> waiting_times(n), turnaround_times(n) ;
     vector<pair<int, pair<int, int> > > gantt ; // ? (PID, (start_time, finish_time))
 
-    deque<pair<int, int> > sorted_arrival ; // ? (arrival time, PID)
+    deque<pair<int, int> > sorted_arrivals ; // ? (arrival time, PID)
     for(int i = 0 ; i < n ; i++)
-        sorted_arrival.push_back({arrival_times[i], i}) ;
-    sort(sorted_arrival.begin(), sorted_arrival.end()) ;
+        sorted_arrivals.push_back({arrival_times[i], i}) ;
+    sort(sorted_arrivals.begin(), sorted_arrivals.end()) ;
     
     using pipii = pair<int, pair<int, int> > ;
     priority_queue<pipii, vector<pipii> , greater<pipii> > ready_queue ; // ? (priority value, (arrival time, PID))
 
-    while(!sorted_arrival.empty() or !ready_queue.empty())
+    while(!sorted_arrivals.empty() or !ready_queue.empty())
     {
-        if(ready_queue.empty() and !sorted_arrival.empty() and curr_time < sorted_arrival.front().first)
-            curr_time = sorted_arrival.front().first ;
-        while(!sorted_arrival.empty() and sorted_arrival.front().first <= curr_time)
+        if(ready_queue.empty() and !sorted_arrivals.empty() and curr_time < sorted_arrivals.front().first)
+            curr_time = sorted_arrivals.front().first ;
+        while(!sorted_arrivals.empty() and sorted_arrivals.front().first <= curr_time)
         {
-            int pid = sorted_arrival.front().second ;
+            int pid = sorted_arrivals.front().second ;
             ready_queue.push({priority_values[pid], {arrival_times[pid], pid}}) ;
-            sorted_arrival.pop_front() ;
+            sorted_arrivals.pop_front() ;
         }
 
         if(!ready_queue.empty())
