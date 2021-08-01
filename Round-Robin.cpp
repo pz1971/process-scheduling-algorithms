@@ -29,35 +29,47 @@ int main()
     // ** ** ** **
 
     int curr_time = 0 ;
-    vector<int> waiting_times(n), turnaround_times(CPU_times.begin(), CPU_times.end()) ;
+    vector<int> waiting_times(n), turnaround_times(n) ;
     vector<pair<int, int> > response_times(n) ; // ? response_times[i] = <flag, response time> 
     vector<pair<int, pair<int, int> > > gantt ; // ? (PID, (start_time, finish_time))
-
-    priority_queue<pair<double, int> , vector<pair<double, int> > , greater<pair<double, int> > > ready_queue ; // ? <arrival time, PID>
+    deque<pair<int, int> > sorted_arrivals ; // ? sorted_arrivals[i] = <arrival_time, PID>
     for(int i = 0 ; i < n ; i++)
-        ready_queue.push(make_pair((double) arrival_times[i], i)) ;
+        sorted_arrivals.push_back(make_pair(arrival_times[i], i)) ;
+    sort(sorted_arrivals.begin(), sorted_arrivals.end()) ;
 
-    while(!ready_queue.empty())
+    queue<int> ready_queue ;
+
+    while(!ready_queue.empty() or !sorted_arrivals.empty())
     {
-        int pid = ready_queue.top().second ;
+        if(ready_queue.empty() and !sorted_arrivals.empty())
+        {
+            ready_queue.push(sorted_arrivals[0].second) ;
+            sorted_arrivals.pop_front() ;
+        }
+        
+        int pid = ready_queue.front() ;
         ready_queue.pop() ;
-
         if(curr_time < arrival_times[pid])
             curr_time = arrival_times[pid] ;
-        waiting_times[pid] += curr_time - arrival_times[pid] ;
-        turnaround_times[pid] += curr_time - arrival_times[pid] ;
-
-        if(response_times[pid].first == 0)
-            response_times[pid] = make_pair(1, waiting_times[pid]) ;
-        
-        int execution_time = min(Q, CPU_times[pid]) ;
-        gantt.push_back(make_pair(pid, make_pair(curr_time, curr_time + execution_time))) ;
-        curr_time += execution_time ;
-        CPU_times[pid] -= execution_time ;
-
+        int execution_time = min(CPU_times[pid], Q) ;
+        if(execution_time > 0)
+        {
+            waiting_times[pid] += curr_time - arrival_times[pid] ;
+            turnaround_times[pid] += curr_time - arrival_times[pid] + execution_time ;
+            if(response_times[pid].first == 0)
+                response_times[pid] = make_pair(1, waiting_times[pid]) ;
+            CPU_times[pid] -= execution_time ;
+            gantt.push_back(make_pair(pid, make_pair(curr_time, curr_time + execution_time))) ;
+            curr_time += execution_time ;
+        }
+        while(!sorted_arrivals.empty() and sorted_arrivals.front().first <= curr_time)
+        {
+            ready_queue.push(sorted_arrivals.front().second) ;
+            sorted_arrivals.pop_front() ;
+        }
         if(CPU_times[pid] > 0)
         {
-            ready_queue.push(make_pair(curr_time + 0.1, pid)) ;
+            ready_queue.push(pid) ;
             arrival_times[pid] = curr_time ;
         }
     }
