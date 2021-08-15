@@ -6,6 +6,23 @@
 #include <bits/stdc++.h>
 using   namespace  std ;
 
+void show_gantt(vector<pair<int, pair<int, int> > > gantt)
+{
+    int curr_time = 0 ;
+    cout << "(0)" ;
+    for(auto &pipii : gantt)
+    {
+        if(pipii.second.first > curr_time)
+        {
+            cout << "---<idle>---" << "(" << pipii.second.first << ")" ;
+            curr_time = pipii.second.first ;
+        }
+        cout << "---" << "<p" << pipii.first + 1 << ">---(" << pipii.second.second << ")" ;
+        curr_time = pipii.second.second ;
+    }
+    cout << endl ;
+}
+
 int main()
 {
     
@@ -40,13 +57,11 @@ int main()
 
     while(!sorted_arrivals.empty() or !ready_queue.empty())
     {
-        if(ready_queue.empty() and !sorted_arrivals.empty() and curr_time < sorted_arrivals.front().first)
-            curr_time = sorted_arrivals.front().first ;
-        while(!sorted_arrivals.empty() and sorted_arrivals.front().first <= curr_time)
+        if(ready_queue.empty() and !sorted_arrivals.empty())
         {
-            int pid = sorted_arrivals.front().second ;
-            ready_queue.push({priority_values[pid], {arrival_times[pid], pid}}) ;
+            pair<int, int> arrival_time_pid = sorted_arrivals.front() ;
             sorted_arrivals.pop_front() ;
+            ready_queue.push({priority_values[arrival_time_pid.second], arrival_time_pid}) ;
         }
 
         if(!ready_queue.empty())
@@ -59,6 +74,12 @@ int main()
             turnaround_times[pid] = waiting_times[pid] + CPU_times[pid] ;
             gantt.push_back(make_pair(pid, make_pair(curr_time, curr_time + CPU_times[pid]))) ;
             curr_time += CPU_times[pid] ;
+
+            while(!sorted_arrivals.empty() and sorted_arrivals.front().first <= curr_time)
+            {
+                ready_queue.push({priority_values[sorted_arrivals.front().second], sorted_arrivals.front()}) ;
+                sorted_arrivals.pop_front() ;
+            }
         }
     }
 
@@ -72,9 +93,8 @@ int main()
     double average_turnaround_time = (double) total_turnaround_time / n ;
     
     // ** Output part
-    cout << "Gantt: <PID, start time, end time>" << endl ;
-    for(auto i : gantt)
-        cout << "<" << i.first << ", " << i.second.first << ", " << i.second.second << ">" << endl ;
+    cout << "Gantt-Chart:" << endl ;
+    show_gantt(gantt) ;
     for(int i = 0 ; i < n ; i++)
     {
         cout << "Process " << i << ": " ;
@@ -86,9 +106,3 @@ int main()
 
     return 0;
 }
-
-// ? Test Case 1:
-// 3
-// 5 7 9
-// 4 0 2
-// 0 2 1

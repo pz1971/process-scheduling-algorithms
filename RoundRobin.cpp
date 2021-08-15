@@ -8,6 +8,23 @@
 #include <bits/stdc++.h>
 using   namespace  std ;
 
+void show_gantt(vector<pair<int, pair<int, int> > > gantt)
+{
+    int curr_time = 0 ;
+    cout << "(0)" ;
+    for(auto &pipii : gantt)
+    {
+        if(pipii.second.first > curr_time)
+        {
+            cout << "---<idle>---" << "(" << pipii.second.first << ")" ;
+            curr_time = pipii.second.first ;
+        }
+        cout << "---" << "<p" << pipii.first + 1 << ">---(" << pipii.second.second << ")" ;
+        curr_time = pipii.second.second ;
+    }
+    cout << endl ;
+}
+
 int main()
 {
     
@@ -88,12 +105,11 @@ int main()
     double average_response_time = (double) total_response_time / n ;
 
     // ** Output part
-    cout << "Gantt: <PID, start time, end time>" << endl ;
-    for(auto i : gantt)
-        cout << "<" << i.first << ", " << i.second.first << ", " << i.second.second << ">" << endl ;
+    cout << "Gantt-Chart:" << endl ;
+    show_gantt(gantt) ;
     for(int i = 0 ; i < n ; i++)
     {
-        cout << "Process " << i << ": " ;
+        cout << "Process " << i + 1 << ": " ;
         cout << "Response Time : " << response_times[i].second << " Waiting Time : " << waiting_times[i] << " Turnaround Time : " << turnaround_times[i] << endl ;
     }
     cout << "Average Response Time : " << average_response_time << endl ;
@@ -103,15 +119,3 @@ int main()
 
     return 0;
 }
-
-// ? Test Case 1:
-// 3
-// 4
-// 5 7 9 9
-// 4 0 6 10
-
-// ? Test Case 2:
-// 4
-// 6
-// 8 8 6 10 13 6
-// 17 16 6 0 12 8

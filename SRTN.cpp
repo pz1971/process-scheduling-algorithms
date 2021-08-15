@@ -7,6 +7,23 @@
 #include <bits/stdc++.h>
 using   namespace  std ;
 
+void show_gantt(vector<pair<int, pair<int, int> > > gantt)
+{
+    int curr_time = 0 ;
+    cout << "(0)" ;
+    for(auto &pipii : gantt)
+    {
+        if(pipii.second.first > curr_time)
+        {
+            cout << "---<idle>---" << "(" << pipii.second.first << ")" ;
+            curr_time = pipii.second.first ;
+        }
+        cout << "---" << "<p" << pipii.first + 1 << ">---(" << pipii.second.second << ")" ;
+        curr_time = pipii.second.second ;
+    }
+    cout << endl ;
+}
+
 int main()
 {
     
@@ -93,9 +110,8 @@ int main()
     double average_response_time = (double) total_response_time / n ;
 
     // ** Output part
-    cout << "Gantt: <PID, start time, end time>" << endl ;
-    for(auto i : gantt)
-        cout << "<" << i.first << ", " << i.second.first << ", " << i.second.second << ">" << endl ;
+    cout << "Gantt-Chart:" << endl ;
+    show_gantt(gantt) ;
     for(int i = 0 ; i < n ; i++)
     {
         cout << "Process " << i << ": " ;
@@ -108,19 +124,3 @@ int main()
 
     return 0;
 }
-
-
-// ? Test case 1:
-// 3
-// 5 7 9
-// 4 0 2
-
-// ? Test case 2:
-// 4
-// 8 4 9 5
-// 0 1 2 3
-
-// ? Test case 3:
-// 5
-// 1000 1 1 1 1
-// 0 5 6 7 8
